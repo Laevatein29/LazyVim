@@ -259,7 +259,7 @@ return {
       ensure_installed = {
         "stylua",
         "shfmt",
-        "eslint@4.8.0",
+        "eslint-lsp@4.8.0",
         -- "flake8",
       },
     },
