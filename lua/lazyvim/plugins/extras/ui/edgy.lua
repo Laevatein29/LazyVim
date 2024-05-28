@@ -53,38 +53,7 @@ return {
           { title = "Neotest Output", ft = "neotest-output-panel", size = { height = 15 } },
         },
         left = {
-          {
-            title = "Neo-Tree",
-            ft = "neo-tree",
-            filter = function(buf)
-              return vim.b[buf].neo_tree_source == "filesystem"
-            end,
-            pinned = true,
-            open = function()
-              require("neo-tree.command").execute({ dir = LazyVim.root() })
-            end,
-            size = { height = 0.5 },
-          },
           { title = "Neotest Summary", ft = "neotest-summary" },
-          {
-            title = "Neo-Tree Git",
-            ft = "neo-tree",
-            filter = function(buf)
-              return vim.b[buf].neo_tree_source == "git_status"
-            end,
-            pinned = true,
-            open = "Neotree position=right git_status",
-          },
-          {
-            title = "Neo-Tree Buffers",
-            ft = "neo-tree",
-            filter = function(buf)
-              return vim.b[buf].neo_tree_source == "buffers"
-            end,
-            pinned = true,
-            open = "Neotree position=top buffers",
-          },
-          "neo-tree",
         },
         keys = {
           -- increase width
@@ -121,17 +90,6 @@ return {
         end,
       },
     },
-  },
-
-  -- prevent neo-tree from opening files in edgy windows
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.open_files_do_not_replace_types = opts.open_files_do_not_replace_types
-        or { "terminal", "Trouble", "qf", "Outline", "trouble" }
-      table.insert(opts.open_files_do_not_replace_types, "edgy")
-    end,
   },
 
   -- Fix bufferline offsets when edgy is loaded
