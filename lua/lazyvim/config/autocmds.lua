@@ -112,3 +112,34 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
+
+local function replaceText(oldText, newText)
+  vim.cmd("%s/" .. oldText .. "/" .. newText .. "/g")
+end
+
+vim.keymap.set("n", "<leader>rw", function()
+  local oldText = vim.fn.input("Enter old text:")
+  print(oldText)
+  local newWord = vim.fn.input("Enter new text:")
+  print(newWord)
+  replaceText(oldText, newWord)
+end, { noremap = true, silent = true })
+
+if true then
+  return {}
+end
+
+-- following function is a demo for building a vim cmd
+
+local function runEslintFixAll()
+  local file_type = vim.bo.filetype
+  local eslint_file_types = { "javascript", "typescript", "vue", "javascript.jsx", "typescript.tsx" }
+  for _, ft in ipairs(eslint_file_types) do
+    if file_type == ft then
+      vim.api.nvim_command("EslintFixAll")
+      break
+    end
+  end
+end
+
+vim.api.nvim_command([[autocmd BufWritePre <buffer> lua runEslintFixAll()]])
