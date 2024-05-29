@@ -3,7 +3,7 @@ return {
     "williamboman/mason-lspconfig.nvim",
     opts = {
       ensure_installed = {
-        "eslint@4.8.0",
+        "eslint",
         "cssls",
         "cssmodules_ls",
         "css_variables",
