@@ -126,7 +126,7 @@ return {
 
       vim.o.laststatus = vim.g.lualine_laststatus
 
-      return {
+      local opts = {
         options = {
           theme = "auto",
           globalstatus = true,
@@ -155,24 +155,25 @@ return {
             {
               function() return require("noice").api.status.command.get() end,
               cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-              color = LazyVim.ui.fg("Statement"),
+              color = function() return LazyVim.ui.fg("Statement") end,
             },
             -- stylua: ignore
             {
               function() return require("noice").api.status.mode.get() end,
               cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
-              color = LazyVim.ui.fg("Constant"),
+              color = function() return LazyVim.ui.fg("Constant") end,
             },
             -- stylua: ignore
             {
               function() return "  " .. require("dap").status() end,
-              cond = function () return package.loaded["dap"] and require("dap").status() ~= "" end,
-              color = LazyVim.ui.fg("Debug"),
+              cond = function() return package.loaded["dap"] and require("dap").status() ~= "" end,
+              color = function() return LazyVim.ui.fg("Debug") end,
             },
+            -- stylua: ignore
             {
               require("lazy.status").updates,
               cond = require("lazy.status").has_updates,
-              color = LazyVim.ui.fg("Special"),
+              color = function() return LazyVim.ui.fg("Special") end,
             },
             {
               "diff",
@@ -205,6 +206,26 @@ return {
         },
         extensions = { "lazy" },
       }
+
+      -- do not add trouble symbols if aerial is enabled
+      if vim.g.trouble_lualine then
+        local trouble = require("trouble")
+        local symbols = trouble.statusline
+          and trouble.statusline({
+            mode = "symbols",
+            groups = {},
+            title = false,
+            filter = { range = true },
+            format = "{kind_icon}{symbol.name:Normal}",
+            hl_group = "lualine_c_normal",
+          })
+        table.insert(opts.sections.lualine_c, {
+          symbols and symbols.get,
+          cond = symbols and symbols.has,
+        })
+      end
+
+      return opts
     end,
   },
 
@@ -331,20 +352,6 @@ return {
   { "MunifTanjim/nui.nvim", lazy = true },
 
   {
-    "goolord/alpha-nvim",
-    optional = true,
-    enabled = function()
-      LazyVim.warn({
-        "`dashboard.nvim` is now the default LazyVim starter plugin.",
-        "",
-        "To keep using `alpha.nvim`, please enable the `lazyvim.plugins.extras.ui.alpha` extra.",
-        "Or to hide this message, remove the alpha spec from your config.",
-      })
-      return false
-    end,
-  },
-
-  {
     "nvimdev/dashboard-nvim",
     lazy = false, -- As https://github.com/nvimdev/dashboard-nvim/pull/450, dashboard-nvim shouldn't be lazy-loaded to properly handle stdin.
     opts = function()
@@ -378,7 +385,7 @@ return {
             { action = 'lua require("persistence").load()',                        desc = " Restore Session", icon = " ", key = "s" },
             { action = "LazyExtras",                                               desc = " Lazy Extras",     icon = " ", key = "x" },
             { action = "Lazy",                                                     desc = " Lazy",            icon = "󰒲 ", key = "l" },
-            { action = "qa",                                                       desc = " Quit",            icon = " ", key = "q" },
+            { action = function() vim.api.nvim_input("<cmd>qa<cr>") end,                                                       desc = " Quit",            icon = " ", key = "q" },
           },
           footer = function()
             local stats = require("lazy").stats()

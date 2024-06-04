@@ -4,8 +4,6 @@ return {
     "neovim/nvim-lspconfig",
     event = "LazyFile",
     dependencies = {
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = false, dependencies = { "nvim-lspconfig" } },
-      { "folke/neodev.nvim", opts = {} },
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
     },
@@ -53,7 +51,14 @@ return {
           enabled = true,
         },
         -- add any global capabilities here
-        capabilities = {},
+        capabilities = {
+          workspace = {
+            fileOperations = {
+              didRename = true,
+              willRename = true,
+            },
+          },
+        },
         -- options for vim.lsp.buf.format
         -- `bufnr` and `filter` is handled by the LazyVim formatter,
         -- but can be also overridden when specified
@@ -68,7 +73,7 @@ return {
             -- mason = false, -- set to false if you don't want this server to be installed with mason
             -- Use this to add any additional keymaps
             -- for specific lsp servers
-            ---@type LazyKeysSpec[]
+            -- ---@type LazyKeysSpec[]
             -- keys = {},
             settings = {
               Lua = {
@@ -112,10 +117,6 @@ return {
     end,
     ---@param opts PluginLspOpts
     config = function(_, opts)
-      if LazyVim.has("neoconf.nvim") then
-        require("neoconf").setup(LazyVim.opts("neoconf.nvim"))
-      end
-
       -- setup autoformat
       LazyVim.format.register(LazyVim.lsp.formatter())
 
@@ -218,11 +219,13 @@ return {
       for server, server_opts in pairs(servers) do
         if server_opts then
           server_opts = server_opts == true and {} or server_opts
-          -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
-          if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
-            setup(server)
-          elseif server_opts.enabled ~= false then
-            ensure_installed[#ensure_installed + 1] = server
+          if server_opts.enabled ~= false then
+            -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+            if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
+              setup(server)
+            else
+              ensure_installed[#ensure_installed + 1] = server
+            end
           end
         end
       end
@@ -238,9 +241,9 @@ return {
         })
       end
 
-      if LazyVim.lsp.get_config("denols") and LazyVim.lsp.get_config("tsserver") then
+      if LazyVim.lsp.is_enabled("denols") and LazyVim.lsp.is_enabled("vtsls") then
         local is_deno = require("lspconfig.util").root_pattern("deno.json", "deno.jsonc")
-        LazyVim.lsp.disable("tsserver", is_deno)
+        LazyVim.lsp.disable("vtsls", is_deno)
         LazyVim.lsp.disable("denols", function(root_dir)
           return not is_deno(root_dir)
         end)
@@ -275,19 +278,15 @@ return {
           })
         end, 100)
       end)
-      local function ensure_installed()
+
+      mr.refresh(function()
         for _, tool in ipairs(opts.ensure_installed) do
           local p = mr.get_package(tool)
           if not p:is_installed() then
             p:install()
           end
         end
-      end
-      if mr.refresh then
-        mr.refresh(ensure_installed)
-      else
-        ensure_installed()
-      end
+      end)
     end,
   },
 }

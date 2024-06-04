@@ -1,8 +1,12 @@
 return {
   recommended = function()
     return LazyVim.extras.wants({
-      ft = "vue",
-      root = { "vue.config.js" },
+      ft = "astro",
+      root = {
+        "astro.config.js",
+        "astro.config.mjs",
+        "astro.config.cjs",
+      },
     })
   end,
 
@@ -13,18 +17,17 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
       if type(opts.ensure_installed) == "table" then
-        vim.list_extend(opts.ensure_installed, { "vue" })
+        vim.list_extend(opts.ensure_installed, { "astro" })
       end
     end,
   },
 
-  -- Add LSP servers
+  -- LSP Servers
   {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        volar = {},
-        vtsls = {},
+        astro = {},
       },
     },
   },
@@ -33,13 +36,14 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
-      table.insert(opts.servers.vtsls.filetypes, "vue")
       LazyVim.extend(opts.servers.vtsls, "settings.vtsls.tsserver.globalPlugins", {
         {
-          name = "@vue/typescript-plugin",
-          location = LazyVim.get_pkg_path("vue-language-server", "/node_modules/@vue/language-server"),
-          languages = { "vue" },
-          configNamespace = "typescript",
+          name = "@astrojs/ts-plugin",
+          location = LazyVim.get_pkg_path(
+            "astro-language-server",
+            "/node_modules/@astrojs/ts-plugin",
+            { warn = false }
+          ),
           enableForWorkspaceTypeScriptVersions = true,
         },
       })

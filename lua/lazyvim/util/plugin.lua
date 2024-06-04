@@ -14,13 +14,10 @@ M.deprecated_extras = {
   ["lazyvim.plugins.extras.ui.treesitter-rewrite"] = "Disabled `treesitter-rewrite` extra for now. Not ready yet.",
   ["lazyvim.plugins.extras.coding.mini-ai"] = "`mini.ai` is now a core LazyVim plugin (again)",
   ["lazyvim.plugins.extras.lazyrc"] = "local spec files are now a lazy.nvim feature",
+  ["lazyvim.plugins.extras.editor.trouble-v3"] = "Trouble v3 has been merged in main",
 }
 
-M.deprecated_modules = {
-  ["null-ls"] = "lsp.none-ls",
-  ["nvim-navic.lib"] = "editor.navic",
-  ["nvim-navic"] = "editor.navic",
-}
+M.deprecated_modules = {}
 
 ---@type table<string, string>
 M.renames = {
