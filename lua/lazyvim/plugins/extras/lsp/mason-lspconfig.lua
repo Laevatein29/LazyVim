@@ -7,6 +7,7 @@ return {
         "cssls",
         "cssmodules_ls",
         "css_variables",
+        "tsserver",
         "lua_ls",
       },
     },
